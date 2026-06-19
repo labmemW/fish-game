@@ -168,6 +168,17 @@ function currentTargetSize() {
   return Math.max(targetByWidth, CONFIG.player.minTargetSize);
 }
 
+function currentGrowthProgress() {
+  const targetSize = currentTargetSize();
+  const range = targetSize - CONFIG.player.initialSize;
+
+  if (range <= 0) {
+    return 1;
+  }
+
+  return clamp((state.player.size - CONFIG.player.initialSize) / range, 0, 1);
+}
+
 function clampPlayer() {
   const player = state.player;
   const marginX = player.length * 0.45;
@@ -229,12 +240,26 @@ function createFish() {
 function chooseFishKind() {
   const canSpawnDanger = state.elapsed >= CONFIG.spawning.dangerDelay;
   const dangerCount = state.fishes.filter((fish) => fish.kind === "danger").length;
+  const progress = currentGrowthProgress();
 
-  if (!canSpawnDanger || dangerCount >= CONFIG.spawning.maxDangerFish) {
+  if (!canSpawnDanger || progress >= CONFIG.spawning.dangerStopProgress) {
     return "small";
   }
 
-  return Math.random() > CONFIG.spawning.smallChanceAfterDelay ? "danger" : "small";
+  const isEarly = progress < CONFIG.spawning.dangerEarlyProgress;
+  const dangerLimit = isEarly
+    ? CONFIG.spawning.maxDangerFishEarly
+    : CONFIG.spawning.maxDangerFishMid;
+
+  if (dangerCount >= dangerLimit) {
+    return "small";
+  }
+
+  const dangerChance = isEarly
+    ? CONFIG.spawning.dangerChanceEarly
+    : CONFIG.spawning.dangerChanceMid;
+
+  return Math.random() < dangerChance ? "danger" : "small";
 }
 
 function randomFishSize(kind) {
@@ -274,11 +299,7 @@ function eatFish(index, fish) {
   state.fishes.splice(index, 1);
   state.eaten += 1;
   state.score += Math.round(fish.size * 100);
-  state.player.size += clamp(
-    fish.size * CONFIG.growth.multiplier,
-    CONFIG.growth.minPerFish,
-    CONFIG.growth.maxPerFish,
-  );
+  state.player.size += growthForFish(fish);
   state.player.flash = 1;
 
   for (let i = 0; i < 7; i += 1) {
@@ -291,6 +312,16 @@ function eatFish(index, fish) {
       speed: random(18, 48),
     });
   }
+}
+
+function growthForFish(fish) {
+  const progress = currentGrowthProgress();
+  const curve = progress * progress;
+  const multiplier = lerp(CONFIG.growth.earlyMultiplier, CONFIG.growth.lateMultiplier, curve);
+  const minGrowth = lerp(CONFIG.growth.earlyMinPerFish, CONFIG.growth.lateMinPerFish, curve);
+  const maxGrowth = lerp(CONFIG.growth.earlyMaxPerFish, CONFIG.growth.lateMaxPerFish, curve);
+
+  return clamp(fish.size * multiplier, minGrowth, maxGrowth);
 }
 
 function draw() {
@@ -354,6 +385,10 @@ function updateUi() {
 
 function random(min, max) {
   return min + Math.random() * (max - min);
+}
+
+function lerp(start, end, t) {
+  return start + (end - start) * t;
 }
 
 function randomSpawnY(fishHeight, kind) {
