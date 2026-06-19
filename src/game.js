@@ -10,6 +10,8 @@ const ui = {
   overlay: document.querySelector("#overlay"),
   statusText: document.querySelector("#statusText"),
   startButton: document.querySelector("#startButton"),
+  pauseButton: document.querySelector("#pauseButton"),
+  resumeButton: document.querySelector("#resumeButton"),
   restartButton: document.querySelector("#restartButton"),
   fishCount: document.querySelector("#fishCount"),
   score: document.querySelector("#score"),
@@ -44,6 +46,8 @@ requestAnimationFrame(loop);
 window.addEventListener("resize", resizeCanvas);
 ui.startButton.addEventListener("click", startGame);
 ui.restartButton.addEventListener("click", startGame);
+ui.pauseButton.addEventListener("click", pauseGame);
+ui.resumeButton.addEventListener("click", resumeGame);
 
 function resizeCanvas() {
   const rect = canvas.getBoundingClientRect();
@@ -88,16 +92,35 @@ function startGame() {
   resetGame();
   state.mode = "playing";
   ui.overlay.classList.add("hidden");
+  ui.pauseButton.classList.remove("hidden");
   window.setTimeout(resizeCanvas, 250);
+  updateUi();
+}
+
+function pauseGame() {
+  if (state.mode !== "playing") {
+    return;
+  }
+
+  state.mode = "paused";
+  ui.overlay.classList.remove("hidden");
+  updateUi();
+}
+
+function resumeGame() {
+  if (state.mode !== "paused") {
+    return;
+  }
+
+  state.mode = "playing";
+  ui.overlay.classList.add("hidden");
+  ui.pauseButton.classList.remove("hidden");
   updateUi();
 }
 
 function endGame(mode) {
   state.mode = mode;
   ui.overlay.classList.remove("hidden");
-  ui.startButton.classList.add("hidden");
-  ui.restartButton.classList.remove("hidden");
-  ui.statusText.textContent = mode === "won" ? "长大啦！" : "被大鱼吃掉了";
   updateUi();
 }
 
@@ -395,12 +418,30 @@ function updateUi() {
   ui.fishCount.textContent = String(state.eaten);
   ui.score.textContent = String(state.score);
   ui.timer.textContent = `${Math.floor(state.elapsed)}s`;
+  ui.startButton.classList.add("hidden");
+  ui.resumeButton.classList.add("hidden");
+  ui.restartButton.classList.add("hidden");
+  ui.pauseButton.classList.toggle("hidden", state.mode !== "playing");
 
   if (state.mode === "ready") {
     ui.overlay.classList.remove("hidden");
     ui.startButton.classList.remove("hidden");
-    ui.restartButton.classList.add("hidden");
     ui.statusText.textContent = "大鱼吃小鱼";
+    return;
+  }
+
+  if (state.mode === "paused") {
+    ui.overlay.classList.remove("hidden");
+    ui.resumeButton.classList.remove("hidden");
+    ui.restartButton.classList.remove("hidden");
+    ui.statusText.textContent = "暂停中";
+    return;
+  }
+
+  if (state.mode === "won" || state.mode === "lost") {
+    ui.overlay.classList.remove("hidden");
+    ui.restartButton.classList.remove("hidden");
+    ui.statusText.textContent = state.mode === "won" ? "长大啦！" : "被大鱼吃掉了";
   }
 }
 

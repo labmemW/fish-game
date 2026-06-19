@@ -139,6 +139,28 @@ button {
   transform: translateY(1px);
 }
 
+.icon-button {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 3;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 999px;
+  background: rgba(4, 47, 74, 0.46);
+  color: #f7fcff;
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 8px 22px rgba(3, 30, 48, 0.18);
+  backdrop-filter: blur(10px);
+}
+
+.icon-button:active {
+  transform: translateY(1px);
+}
+
 .hidden {
   display: none;
 }
