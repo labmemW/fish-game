@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>大鱼吃小鱼</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="game-shell" aria-label="大鱼吃小鱼">
+      <canvas id="gameCanvas" aria-label="游戏画面"></canvas>
+
+      <section class="hud" aria-live="polite">
+        <div>
+          <span class="hud-label">吃到</span>
+          <strong id="fishCount">0</strong>
+        </div>
+        <div>
+          <span class="hud-label">分数</span>
+          <strong id="score">0</strong>
+        </div>
+        <div>
+          <span class="hud-label">用时</span>
+          <strong id="timer">0s</strong>
+        </div>
+      </section>
+
+      <section id="overlay" class="overlay">
+        <div class="dialog">
+          <p id="statusText" class="status-text">大鱼吃小鱼</p>
+          <button id="startButton" class="primary-button" type="button">开始</button>
+          <button id="restartButton" class="primary-button hidden" type="button">再玩一次</button>
+        </div>
+      </section>
+
+      <aside class="rotate-tip" aria-hidden="true">横屏玩会更舒服</aside>
+    </main>
+
+    <script type="module" src="./src/game.js"></script>
+  </body>
+</html>
