@@ -13,13 +13,15 @@ export const CONFIG = {
     interval: 0.9,
     dangerDelay: 10,
     smallChanceAfterDelay: 0.75,
+    maxDangerFish: 1,
+    dangerAvoidPlayerY: 120,
     sidePadding: 90,
   },
   fishSize: {
     smallMin: 0.45,
     smallMax: 0.8,
     dangerMin: 1.25,
-    dangerMax: 1.8,
+    dangerMax: 1.55,
   },
   growth: {
     multiplier: 0.1,

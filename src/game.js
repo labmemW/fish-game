@@ -84,9 +84,11 @@ function resetGame() {
 }
 
 function startGame() {
+  requestGameFullscreen();
   resetGame();
   state.mode = "playing";
   ui.overlay.classList.add("hidden");
+  window.setTimeout(resizeCanvas, 250);
   updateUi();
 }
 
@@ -195,16 +197,14 @@ function spawnFishIfNeeded() {
 }
 
 function createFish() {
-  const canSpawnDanger = state.elapsed >= CONFIG.spawning.dangerDelay;
-  const kind =
-    canSpawnDanger && Math.random() > CONFIG.spawning.smallChanceAfterDelay ? "danger" : "small";
+  const kind = chooseFishKind();
   const side = Math.random() < 0.5 ? -1 : 1;
   const direction = side === -1 ? 1 : -1;
   const size = randomFishSize(kind);
   const length = CONFIG.world.fishBaseLength * size;
   const height = CONFIG.world.fishBaseHeight * size;
   const x = side === -1 ? -length : state.width + length;
-  const y = randomSpawnY(height);
+  const y = randomSpawnY(height, kind);
   const speed = random(76, 136) + Math.min(42, state.elapsed * 1.1) + (kind === "danger" ? 18 : 0);
   const palette = kind === "danger" ? COLORS.danger : COLORS.small;
 
@@ -217,6 +217,17 @@ function createFish() {
     kind,
     color: palette[Math.floor(Math.random() * palette.length)],
   });
+}
+
+function chooseFishKind() {
+  const canSpawnDanger = state.elapsed >= CONFIG.spawning.dangerDelay;
+  const dangerCount = state.fishes.filter((fish) => fish.kind === "danger").length;
+
+  if (!canSpawnDanger || dangerCount >= CONFIG.spawning.maxDangerFish) {
+    return "small";
+  }
+
+  return Math.random() > CONFIG.spawning.smallChanceAfterDelay ? "danger" : "small";
 }
 
 function randomFishSize(kind) {
@@ -338,9 +349,44 @@ function random(min, max) {
   return min + Math.random() * (max - min);
 }
 
-function randomSpawnY(fishHeight) {
+function randomSpawnY(fishHeight, kind) {
   const margin = Math.max(24, fishHeight * 0.7);
-  return random(margin, Math.max(margin, state.height - margin));
+  const min = margin;
+  const max = Math.max(margin, state.height - margin);
+
+  if (kind !== "danger" || !state.player) {
+    return random(min, max);
+  }
+
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const y = random(min, max);
+
+    if (Math.abs(y - state.player.y) >= CONFIG.spawning.dangerAvoidPlayerY) {
+      return y;
+    }
+  }
+
+  const topDistance = Math.abs(min - state.player.y);
+  const bottomDistance = Math.abs(max - state.player.y);
+  return topDistance > bottomDistance ? min : max;
+}
+
+function requestGameFullscreen() {
+  const shell = document.querySelector(".game-shell");
+  const requestFullscreen =
+    shell.requestFullscreen ||
+    shell.webkitRequestFullscreen ||
+    shell.msRequestFullscreen;
+
+  if (!requestFullscreen || document.fullscreenElement || document.webkitFullscreenElement) {
+    return;
+  }
+
+  const result = requestFullscreen.call(shell);
+
+  if (result && typeof result.catch === "function") {
+    result.catch(() => {});
+  }
 }
 
 function clamp(value, min, max) {
