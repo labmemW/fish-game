@@ -1,8 +1,8 @@
 export const CONFIG = {
   player: {
     initialSize: 1,
-    initialSpeed: 390,
-    minSpeed: 315,
+    initialSpeed: 780,
+    minSpeed: 630,
     speedLossPerSize: 25,
     startXRatio: 0.28,
     startYRatio: 0.5,
