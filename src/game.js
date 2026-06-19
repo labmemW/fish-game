@@ -213,10 +213,58 @@ function clampPlayer() {
 
 function updateFishes(dt) {
   for (const fish of state.fishes) {
+    updateSmallFishBehavior(fish);
     fish.update(dt);
+    clampFishVerticalPosition(fish);
   }
 
   state.fishes = state.fishes.filter((fish) => !fish.isOffscreen(state.width));
+}
+
+function updateSmallFishBehavior(fish) {
+  if (fish.kind !== "small") {
+    return;
+  }
+
+  const dx = fish.x - state.player.x;
+  const dy = fish.y - state.player.y;
+  const distanceToPlayer = Math.hypot(dx, dy);
+  const fleeRange =
+    CONFIG.smallFishBehavior.fleeBaseRange +
+    state.player.size * CONFIG.smallFishBehavior.fleeRangeByPlayerSize;
+
+  if (distanceToPlayer > 0 && distanceToPlayer < fleeRange) {
+    const sizeGap = Math.max(0, state.player.size - fish.size);
+    const fleeSpeed = Math.min(
+      CONFIG.smallFishBehavior.fleeMaxBonusSpeed,
+      CONFIG.smallFishBehavior.fleeBaseSpeed +
+        sizeGap * CONFIG.smallFishBehavior.fleeSpeedBySizeGap,
+    );
+    const strength = 1 - distanceToPlayer / fleeRange;
+    const targetVelocityX = fish.baseVelocityX + (dx / distanceToPlayer) * fleeSpeed * strength;
+    const targetVelocityY = fish.baseVelocityY + (dy / distanceToPlayer) * fleeSpeed * strength;
+
+    fish.velocityX = lerp(fish.velocityX, targetVelocityX, CONFIG.smallFishBehavior.fleeSteering);
+    fish.velocityY = lerp(fish.velocityY, targetVelocityY, CONFIG.smallFishBehavior.fleeSteering);
+    return;
+  }
+
+  fish.velocityX = lerp(fish.velocityX, fish.baseVelocityX, CONFIG.smallFishBehavior.returnSteering);
+  fish.velocityY = lerp(fish.velocityY, fish.baseVelocityY, CONFIG.smallFishBehavior.returnSteering);
+}
+
+function clampFishVerticalPosition(fish) {
+  const margin = Math.max(12, fish.height * 0.5);
+
+  if (fish.y < margin) {
+    fish.y = margin;
+    fish.velocityY = Math.abs(fish.velocityY) * 0.45;
+  }
+
+  if (fish.y > state.height - margin) {
+    fish.y = state.height - margin;
+    fish.velocityY = -Math.abs(fish.velocityY) * 0.45;
+  }
 }
 
 function updateEffects(dt) {

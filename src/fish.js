@@ -9,6 +9,8 @@ export class Fish {
     this.speed = speed;
     this.kind = kind;
     this.color = color;
+    this.baseVelocityX = direction * speed;
+    this.baseVelocityY = 0;
     this.velocityX = direction * speed;
     this.velocityY = 0;
     this.flash = 0;

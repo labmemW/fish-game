@@ -42,6 +42,15 @@ export const CONFIG = {
     radiusXByLength: 0.3,
     radiusYByHeight: 0.36,
   },
+  smallFishBehavior: {
+    fleeBaseRange: 120,
+    fleeRangeByPlayerSize: 18,
+    fleeBaseSpeed: 38,
+    fleeSpeedBySizeGap: 52,
+    fleeMaxBonusSpeed: 210,
+    fleeSteering: 0.12,
+    returnSteering: 0.05,
+  },
   timing: {
     victoryMinSeconds: 60,
     victoryMaxSeconds: 120,
