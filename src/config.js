@@ -45,9 +45,9 @@ export const CONFIG = {
   smallFishBehavior: {
     fleeBaseRange: 120,
     fleeRangeByPlayerSize: 18,
-    fleeBaseSpeed: 38,
-    fleeSpeedBySizeGap: 52,
-    fleeMaxBonusSpeed: 210,
+    fleeBaseSpeed: 76,
+    fleeSpeedBySizeGap: 104,
+    fleeMaxBonusSpeed: 420,
     fleeSteering: 0.12,
     returnSteering: 0.05,
   },
