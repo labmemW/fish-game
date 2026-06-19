@@ -37,6 +37,7 @@ export const CONFIG = {
     lateMinPerFish: 0.09,
     earlyMaxPerFish: 0.06,
     lateMaxPerFish: 0.62,
+    postDangerMaxBoost: 1.8,
   },
   collision: {
     radiusXByLength: 0.3,

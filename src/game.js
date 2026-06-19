@@ -215,7 +215,10 @@ function updateFishes(dt) {
   for (const fish of state.fishes) {
     updateSmallFishBehavior(fish);
     fish.update(dt);
-    clampFishVerticalPosition(fish);
+
+    if (fish.kind !== "small") {
+      clampFishVerticalPosition(fish);
+    }
   }
 
   state.fishes = state.fishes.filter((fish) => !fish.isOffscreen(state.width));
@@ -412,8 +415,16 @@ function growthForFish(fish) {
   const multiplier = lerp(CONFIG.growth.earlyMultiplier, CONFIG.growth.lateMultiplier, curve);
   const minGrowth = lerp(CONFIG.growth.earlyMinPerFish, CONFIG.growth.lateMinPerFish, curve);
   const maxGrowth = lerp(CONFIG.growth.earlyMaxPerFish, CONFIG.growth.lateMaxPerFish, curve);
+  const baseGrowth = clamp(fish.size * multiplier, minGrowth, maxGrowth);
+  const postDangerProgress = clamp(
+    (progress - CONFIG.spawning.dangerStopProgress) /
+      (1 - CONFIG.spawning.dangerStopProgress),
+    0,
+    1,
+  );
+  const postDangerBoost = lerp(1, CONFIG.growth.postDangerMaxBoost, postDangerProgress);
 
-  return clamp(fish.size * multiplier, minGrowth, maxGrowth);
+  return baseGrowth * postDangerBoost;
 }
 
 function draw() {
