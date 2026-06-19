@@ -215,14 +215,23 @@ function spawnFishIfNeeded() {
 }
 
 function createFish() {
-  const kind = chooseFishKind();
+  let kind = chooseFishKind();
   const side = Math.random() < 0.5 ? -1 : 1;
   const direction = side === -1 ? 1 : -1;
-  const size = randomFishSize(kind);
-  const length = CONFIG.world.fishBaseLength * size;
-  const height = CONFIG.world.fishBaseHeight * size;
+  let size = randomFishSize(kind);
+  let length = CONFIG.world.fishBaseLength * size;
+  let height = CONFIG.world.fishBaseHeight * size;
+  let y = randomSpawnY(height, kind);
+
+  if (kind === "danger" && y === null) {
+    kind = "small";
+    size = randomFishSize(kind);
+    length = CONFIG.world.fishBaseLength * size;
+    height = CONFIG.world.fishBaseHeight * size;
+    y = randomSpawnY(height, kind);
+  }
+
   const x = side === -1 ? -length : state.width + length;
-  const y = randomSpawnY(height, kind);
   const speed = random(76, 136) + Math.min(42, state.elapsed * 1.1) + (kind === "danger" ? 18 : 0);
   const palette = kind === "danger" ? COLORS.danger : COLORS.small;
 
@@ -412,17 +421,49 @@ function randomSpawnY(fishHeight, kind) {
     return random(min, max);
   }
 
-  for (let attempt = 0; attempt < 8; attempt += 1) {
+  for (let attempt = 0; attempt < CONFIG.spawning.dangerSpawnAttempts; attempt += 1) {
     const y = random(min, max);
 
-    if (Math.abs(y - state.player.y) >= CONFIG.spawning.dangerAvoidPlayerY) {
+    if (
+      Math.abs(y - state.player.y) >= CONFIG.spawning.dangerAvoidPlayerY &&
+      leavesSafeVerticalPassage(y, fishHeight)
+    ) {
       return y;
     }
   }
 
-  const topDistance = Math.abs(min - state.player.y);
-  const bottomDistance = Math.abs(max - state.player.y);
-  return topDistance > bottomDistance ? min : max;
+  return null;
+}
+
+function leavesSafeVerticalPassage(candidateY, candidateHeight) {
+  const requiredGap = state.player.height * CONFIG.spawning.dangerPassageByPlayerHeight;
+  const intervals = state.fishes
+    .filter((fish) => fish.kind === "danger")
+    .map((fish) => dangerVerticalBand(fish.y, fish.height));
+
+  intervals.push(dangerVerticalBand(candidateY, candidateHeight));
+  intervals.sort((a, b) => a.start - b.start);
+
+  let cursor = 0;
+
+  for (const interval of intervals) {
+    if (interval.start - cursor >= requiredGap) {
+      return true;
+    }
+
+    cursor = Math.max(cursor, interval.end);
+  }
+
+  return state.height - cursor >= requiredGap;
+}
+
+function dangerVerticalBand(y, height) {
+  const halfHeight = height * 0.55;
+
+  return {
+    start: clamp(y - halfHeight, 0, state.height),
+    end: clamp(y + halfHeight, 0, state.height),
+  };
 }
 
 function requestGameFullscreen() {

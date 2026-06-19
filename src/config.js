@@ -20,6 +20,8 @@ export const CONFIG = {
     maxDangerFishEarly: 2,
     maxDangerFishMid: 1,
     dangerAvoidPlayerY: 120,
+    dangerPassageByPlayerHeight: 1.25,
+    dangerSpawnAttempts: 18,
     sidePadding: 90,
   },
   fishSize: {
