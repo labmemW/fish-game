@@ -123,7 +123,7 @@ function update(dt) {
   spawnFishIfNeeded();
   handleCollisions();
 
-  if (state.player.size >= CONFIG.player.targetSize) {
+  if (state.player.size >= currentTargetSize()) {
     endGame("won");
   }
 
@@ -159,6 +159,13 @@ function updatePlayer(dt) {
 function currentPlayerSpeed() {
   const loss = (state.player.size - CONFIG.player.initialSize) * CONFIG.player.speedLossPerSize;
   return Math.max(CONFIG.player.minSpeed, CONFIG.player.initialSpeed - loss);
+}
+
+function currentTargetSize() {
+  const targetByWidth =
+    (state.width * CONFIG.player.targetLengthRatio) / CONFIG.world.fishBaseLength;
+
+  return clamp(targetByWidth, CONFIG.player.minTargetSize, CONFIG.player.maxTargetSize);
 }
 
 function clampPlayer() {

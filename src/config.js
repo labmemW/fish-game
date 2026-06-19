@@ -1,12 +1,14 @@
 export const CONFIG = {
   player: {
     initialSize: 1,
-    targetSize: 2.8,
     initialSpeed: 260,
     minSpeed: 210,
     speedLossPerSize: 25,
     startXRatio: 0.28,
     startYRatio: 0.5,
+    targetLengthRatio: 0.32,
+    minTargetSize: 4.2,
+    maxTargetSize: 6.2,
   },
   spawning: {
     maxFish: 10,
