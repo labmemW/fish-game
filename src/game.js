@@ -50,9 +50,8 @@ ui.pauseButton.addEventListener("click", pauseGame);
 ui.resumeButton.addEventListener("click", resumeGame);
 
 function resizeCanvas() {
-  const rect = canvas.getBoundingClientRect();
-  const width = Math.max(CONFIG.world.minWidth, rect.width || window.innerWidth);
-  const height = Math.max(CONFIG.world.minHeight, rect.height || window.innerHeight);
+  const width = Math.max(CONFIG.world.minWidth, canvas.clientWidth || window.innerWidth);
+  const height = Math.max(CONFIG.world.minHeight, canvas.clientHeight || window.innerHeight);
   const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
 
   canvas.logicalWidth = width;

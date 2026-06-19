@@ -47,6 +47,18 @@ export class InputController {
   };
 
   toCanvasPoint(event) {
+    if (this.isPseudoLandscape()) {
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      const dx = event.clientX - centerX;
+      const dy = event.clientY - centerY;
+
+      return {
+        x: this.canvas.logicalWidth / 2 + dy,
+        y: this.canvas.logicalHeight / 2 - dx,
+      };
+    }
+
     const rect = this.canvas.getBoundingClientRect();
     const scaleX = this.canvas.logicalWidth / rect.width;
     const scaleY = this.canvas.logicalHeight / rect.height;
@@ -55,5 +67,9 @@ export class InputController {
       x: (event.clientX - rect.left) * scaleX,
       y: (event.clientY - rect.top) * scaleY,
     };
+  }
+
+  isPseudoLandscape() {
+    return window.matchMedia("(orientation: portrait) and (max-width: 700px)").matches;
   }
 }
