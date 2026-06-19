@@ -37,7 +37,8 @@ export const CONFIG = {
     lateMaxPerFish: 0.62,
   },
   collision: {
-    radiusByLength: 0.35,
+    radiusXByLength: 0.3,
+    radiusYByHeight: 0.36,
   },
   timing: {
     victoryMinSeconds: 60,

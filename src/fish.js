@@ -22,8 +22,12 @@ export class Fish {
     return CONFIG.world.fishBaseHeight * this.size;
   }
 
-  get collisionRadius() {
-    return this.length * CONFIG.collision.radiusByLength;
+  get collisionRadiusX() {
+    return this.length * CONFIG.collision.radiusXByLength;
+  }
+
+  get collisionRadiusY() {
+    return this.height * CONFIG.collision.radiusYByHeight;
   }
 
   update(dt) {
@@ -103,12 +107,6 @@ export function drawFish(ctx, fish, options = {}) {
   }
 
   ctx.restore();
-}
-
-export function distance(a, b) {
-  const dx = a.x - b.x;
-  const dy = a.y - b.y;
-  return Math.hypot(dx, dy);
 }
 
 function shade(hex, amount) {

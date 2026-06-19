@@ -1,5 +1,5 @@
 import { CONFIG } from "./config.js";
-import { Fish, distance, drawFish } from "./fish.js";
+import { Fish, drawFish } from "./fish.js";
 import { InputController } from "./input.js";
 
 const canvas = document.querySelector("#gameCanvas");
@@ -277,9 +277,8 @@ function handleCollisions() {
 
   for (let index = state.fishes.length - 1; index >= 0; index -= 1) {
     const fish = state.fishes[index];
-    const hitDistance = player.collisionRadius + fish.collisionRadius;
 
-    if (distance(player, fish) > hitDistance) {
+    if (!ellipseCollision(player, fish)) {
       continue;
     }
 
@@ -293,6 +292,19 @@ function handleCollisions() {
       return;
     }
   }
+}
+
+function ellipseCollision(a, b) {
+  const radiusX = a.collisionRadiusX + b.collisionRadiusX;
+  const radiusY = a.collisionRadiusY + b.collisionRadiusY;
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+
+  if (radiusX <= 0 || radiusY <= 0) {
+    return false;
+  }
+
+  return (dx * dx) / (radiusX * radiusX) + (dy * dy) / (radiusY * radiusY) <= 1;
 }
 
 function eatFish(index, fish) {
