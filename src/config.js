@@ -6,9 +6,8 @@ export const CONFIG = {
     speedLossPerSize: 25,
     startXRatio: 0.28,
     startYRatio: 0.5,
-    targetLengthRatio: 0.32,
+    targetLengthRatio: 1.05,
     minTargetSize: 4.2,
-    maxTargetSize: 6.2,
   },
   spawning: {
     maxFish: 10,

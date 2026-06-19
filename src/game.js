@@ -165,7 +165,7 @@ function currentTargetSize() {
   const targetByWidth =
     (state.width * CONFIG.player.targetLengthRatio) / CONFIG.world.fishBaseLength;
 
-  return clamp(targetByWidth, CONFIG.player.minTargetSize, CONFIG.player.maxTargetSize);
+  return Math.max(targetByWidth, CONFIG.player.minTargetSize);
 }
 
 function clampPlayer() {
