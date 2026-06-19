@@ -566,6 +566,10 @@ function dangerVerticalBand(y, height) {
 }
 
 function requestGameFullscreen() {
+  if (isPseudoLandscapeMode()) {
+    return;
+  }
+
   const shell = document.querySelector(".game-shell");
   const requestFullscreen =
     shell.requestFullscreen ||
@@ -581,6 +585,10 @@ function requestGameFullscreen() {
   if (result && typeof result.catch === "function") {
     result.catch(() => {});
   }
+}
+
+function isPseudoLandscapeMode() {
+  return window.matchMedia("(orientation: portrait) and (max-width: 700px)").matches;
 }
 
 function clamp(value, min, max) {
