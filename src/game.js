@@ -452,6 +452,11 @@ function handleCollisions() {
     }
 
     if (fish.size >= player.size * CONFIG.fishSize.dangerMin) {
+      if (isGrowthBoostActive()) {
+        eatFish(index, fish, { comboDanger: true });
+        continue;
+      }
+
       endGame("lost");
       return;
     }
@@ -471,11 +476,14 @@ function ellipseCollision(a, b) {
   return (dx * dx) / (radiusX * radiusX) + (dy * dy) / (radiusY * radiusY) <= 1;
 }
 
-function eatFish(index, fish) {
+function eatFish(index, fish, options = {}) {
   state.fishes.splice(index, 1);
   state.timeSinceEat = 0;
   registerComboEat();
-  const growthMultiplier = consumeGrowthMultiplier();
+  const comboGrowthMultiplier = consumeGrowthMultiplier();
+  const growthMultiplier = options.comboDanger
+    ? CONFIG.combo.dangerGrowthMultiplier
+    : comboGrowthMultiplier;
   state.eaten += 1;
   state.score += Math.round(fish.size * 100);
   state.player.size += growthForFish(fish) * growthMultiplier;
@@ -483,7 +491,7 @@ function eatFish(index, fish) {
   updatePlayerComboColor();
   audio.playEat(fish.size);
 
-  const bubbleCount = growthMultiplier > 1 ? 12 : 7;
+  const bubbleCount = growthMultiplier > 1 || options.comboDanger ? 12 : 7;
 
   for (let i = 0; i < bubbleCount; i += 1) {
     state.effects.push({
