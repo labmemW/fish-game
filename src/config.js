@@ -59,8 +59,7 @@ export const CONFIG = {
   combo: {
     windowSeconds: 1,
     triggerEats: 3,
-    boostDuration: 6,
-    boostEats: 1,
+    boostDuration: 5,
     growthMultiplier: 2,
     dangerGrowthMultiplier: 1.2,
     dangerChanceBonus: 0.14,

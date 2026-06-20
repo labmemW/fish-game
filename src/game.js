@@ -37,7 +37,6 @@ const state = {
   timeSinceEat: 0,
   comboEatTimes: [],
   growthBoostUntil: 0,
-  growthBoostEatsRemaining: 0,
   score: 0,
   eaten: 0,
   dangerSpawned: 0,
@@ -83,7 +82,6 @@ function resetGame() {
   state.timeSinceEat = 0;
   state.comboEatTimes = [];
   state.growthBoostUntil = 0;
-  state.growthBoostEatsRemaining = 0;
   state.score = 0;
   state.eaten = 0;
   state.dangerSpawned = 0;
@@ -489,9 +487,7 @@ function eatFish(index, fish, options = {}) {
   const boosted = isGrowthBoostActive();
   const growthMultiplier = growthMultiplierForFish(fish, options, boosted);
 
-  if (boosted) {
-    consumeGrowthBoost();
-  } else {
+  if (!boosted) {
     registerComboEat();
   }
 
@@ -526,7 +522,6 @@ function registerComboEat() {
   }
 
   state.growthBoostUntil = state.elapsed + CONFIG.combo.boostDuration;
-  state.growthBoostEatsRemaining = CONFIG.combo.boostEats;
   state.comboEatTimes = [];
 }
 
@@ -542,14 +537,8 @@ function growthMultiplierForFish(fish, options, boosted) {
   return CONFIG.combo.growthMultiplier;
 }
 
-function consumeGrowthBoost() {
-  state.growthBoostEatsRemaining = 0;
-  state.growthBoostUntil = 0;
-  state.comboEatTimes = [];
-}
-
 function isGrowthBoostActive() {
-  return state.growthBoostEatsRemaining > 0 && state.elapsed <= state.growthBoostUntil;
+  return state.growthBoostUntil > 0 && state.elapsed <= state.growthBoostUntil;
 }
 
 function updatePlayerComboColor() {
