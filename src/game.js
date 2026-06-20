@@ -419,9 +419,16 @@ function chooseFishKind() {
     return "small";
   }
 
-  const dangerChance = isEarly
+  let dangerChance = isEarly
     ? CONFIG.spawning.dangerChanceEarly
     : CONFIG.spawning.dangerChanceMid;
+
+  if (isGrowthBoostActive()) {
+    dangerChance = Math.min(
+      CONFIG.combo.dangerChanceMax,
+      dangerChance + CONFIG.combo.dangerChanceBonus,
+    );
+  }
 
   return Math.random() < dangerChance ? "danger" : "small";
 }
@@ -546,7 +553,20 @@ function isGrowthBoostActive() {
 }
 
 function updatePlayerComboColor() {
-  state.player.color = isGrowthBoostActive() ? CONFIG.combo.boostColor : COLORS.player;
+  if (!isGrowthBoostActive()) {
+    state.player.color = COLORS.player;
+    return;
+  }
+
+  const remaining = state.growthBoostUntil - state.elapsed;
+
+  if (remaining <= CONFIG.combo.warningSeconds) {
+    const blinkPhase = Math.floor(state.elapsed * CONFIG.combo.warningFlashHz * 2);
+    state.player.color = blinkPhase % 2 === 0 ? CONFIG.combo.boostColor : COLORS.player;
+    return;
+  }
+
+  state.player.color = CONFIG.combo.boostColor;
 }
 
 function applyHungerDecay(dt) {

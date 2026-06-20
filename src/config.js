@@ -59,10 +59,14 @@ export const CONFIG = {
   combo: {
     windowSeconds: 1,
     triggerEats: 3,
-    boostDuration: 4,
+    boostDuration: 6,
     boostEats: 1,
     growthMultiplier: 2,
     dangerGrowthMultiplier: 1.2,
+    dangerChanceBonus: 0.14,
+    dangerChanceMax: 0.52,
+    warningSeconds: 1.5,
+    warningFlashHz: 5,
     boostColor: "#ff2445",
   },
   collision: {
