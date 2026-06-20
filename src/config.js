@@ -18,7 +18,7 @@ export const CONFIG = {
     dangerEarlyProgress: 0.28,
     dangerStopProgress: 0.55,
     dangerChanceEarly: 0.38,
-    dangerChanceMid: 0.2,
+    dangerChanceMid: 0.38,
     maxDangerFishEarly: 2,
     maxDangerFishMid: 1,
     dangerAvoidPlayerY: 120,
