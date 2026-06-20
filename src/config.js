@@ -42,6 +42,7 @@ export const CONFIG = {
     smallMax: 0.8,
     dangerMin: 1.25,
     dangerMax: 1.55,
+    dangerCollisionMin: 1.08,
   },
   growth: {
     earlyMultiplier: 0.07,

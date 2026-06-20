@@ -451,17 +451,17 @@ function handleCollisions() {
       continue;
     }
 
+    if (isGrowthBoostActive()) {
+      eatFish(index, fish, { comboDanger: fish.size > player.size * CONFIG.fishSize.smallMax });
+      continue;
+    }
+
     if (fish.size <= player.size * CONFIG.fishSize.smallMax) {
       eatFish(index, fish);
       continue;
     }
 
-    if (fish.size >= player.size * CONFIG.fishSize.dangerMin) {
-      if (isGrowthBoostActive()) {
-        eatFish(index, fish, { comboDanger: true });
-        continue;
-      }
-
+    if (fish.size >= player.size * CONFIG.fishSize.dangerCollisionMin) {
       endGame("lost");
       return;
     }
