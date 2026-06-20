@@ -58,11 +58,11 @@ export const CONFIG = {
   },
   combo: {
     windowSeconds: 1,
-    triggerEats: 2,
+    triggerEats: 3,
     boostDuration: 4,
-    boostEats: 5,
+    boostEats: 1,
     growthMultiplier: 2,
-    dangerGrowthMultiplier: 0.8,
+    dangerGrowthMultiplier: 1.2,
     boostColor: "#ff2445",
   },
   collision: {

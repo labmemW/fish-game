@@ -479,11 +479,15 @@ function ellipseCollision(a, b) {
 function eatFish(index, fish, options = {}) {
   state.fishes.splice(index, 1);
   state.timeSinceEat = 0;
-  registerComboEat();
-  const comboGrowthMultiplier = consumeGrowthMultiplier();
-  const growthMultiplier = options.comboDanger
-    ? CONFIG.combo.dangerGrowthMultiplier
-    : comboGrowthMultiplier;
+  const boosted = isGrowthBoostActive();
+  const growthMultiplier = growthMultiplierForFish(fish, options, boosted);
+
+  if (boosted) {
+    consumeGrowthBoost();
+  } else {
+    registerComboEat();
+  }
+
   state.eaten += 1;
   state.score += Math.round(fish.size * 100);
   state.player.size += growthForFish(fish) * growthMultiplier;
@@ -515,22 +519,26 @@ function registerComboEat() {
   }
 
   state.growthBoostUntil = state.elapsed + CONFIG.combo.boostDuration;
-  state.growthBoostEatsRemaining = Math.max(
-    state.growthBoostEatsRemaining,
-    CONFIG.combo.boostEats,
-  );
+  state.growthBoostEatsRemaining = CONFIG.combo.boostEats;
   state.comboEatTimes = [];
 }
 
-function consumeGrowthMultiplier() {
-  if (!isGrowthBoostActive()) {
-    updatePlayerComboColor();
+function growthMultiplierForFish(fish, options, boosted) {
+  if (!boosted) {
     return 1;
   }
 
-  state.growthBoostEatsRemaining -= 1;
-  updatePlayerComboColor();
+  if (options.comboDanger || fish.kind === "danger") {
+    return CONFIG.combo.dangerGrowthMultiplier;
+  }
+
   return CONFIG.combo.growthMultiplier;
+}
+
+function consumeGrowthBoost() {
+  state.growthBoostEatsRemaining = 0;
+  state.growthBoostUntil = 0;
+  state.comboEatTimes = [];
 }
 
 function isGrowthBoostActive() {
