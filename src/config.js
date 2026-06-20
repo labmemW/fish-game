@@ -56,6 +56,14 @@ export const CONFIG = {
     idleDelay: 3,
     decayPerSecond: 0.018,
   },
+  combo: {
+    windowSeconds: 1,
+    triggerEats: 3,
+    boostDuration: 4,
+    boostEats: 5,
+    growthMultiplier: 2,
+    boostColor: "#fff06a",
+  },
   collision: {
     radiusXByLength: 0.3,
     radiusYByHeight: 0.36,

@@ -35,6 +35,9 @@ const state = {
   elapsed: 0,
   spawnTimer: 0,
   timeSinceEat: 0,
+  comboEatTimes: [],
+  growthBoostUntil: 0,
+  growthBoostEatsRemaining: 0,
   score: 0,
   eaten: 0,
   dangerSpawned: 0,
@@ -78,6 +81,9 @@ function resetGame() {
   state.elapsed = 0;
   state.spawnTimer = 0;
   state.timeSinceEat = 0;
+  state.comboEatTimes = [];
+  state.growthBoostUntil = 0;
+  state.growthBoostEatsRemaining = 0;
   state.score = 0;
   state.eaten = 0;
   state.dangerSpawned = 0;
@@ -171,6 +177,7 @@ function update(dt) {
   state.spawnTimer += dt;
   state.timeSinceEat += dt;
 
+  updatePlayerComboColor();
   updatePlayer(dt);
   updateFishes(dt);
   updateEffects(dt);
@@ -467,13 +474,18 @@ function ellipseCollision(a, b) {
 function eatFish(index, fish) {
   state.fishes.splice(index, 1);
   state.timeSinceEat = 0;
+  registerComboEat();
+  const growthMultiplier = consumeGrowthMultiplier();
   state.eaten += 1;
   state.score += Math.round(fish.size * 100);
-  state.player.size += growthForFish(fish);
+  state.player.size += growthForFish(fish) * growthMultiplier;
   state.player.flash = 1;
+  updatePlayerComboColor();
   audio.playEat(fish.size);
 
-  for (let i = 0; i < 7; i += 1) {
+  const bubbleCount = growthMultiplier > 1 ? 12 : 7;
+
+  for (let i = 0; i < bubbleCount; i += 1) {
     state.effects.push({
       x: fish.x + random(-fish.length * 0.18, fish.length * 0.18),
       y: fish.y + random(-fish.height * 0.25, fish.height * 0.25),
@@ -483,6 +495,42 @@ function eatFish(index, fish) {
       speed: random(18, 48),
     });
   }
+}
+
+function registerComboEat() {
+  const cutoff = state.elapsed - CONFIG.combo.windowSeconds;
+  state.comboEatTimes = state.comboEatTimes.filter((time) => time >= cutoff);
+  state.comboEatTimes.push(state.elapsed);
+
+  if (state.comboEatTimes.length < CONFIG.combo.triggerEats) {
+    return;
+  }
+
+  state.growthBoostUntil = state.elapsed + CONFIG.combo.boostDuration;
+  state.growthBoostEatsRemaining = Math.max(
+    state.growthBoostEatsRemaining,
+    CONFIG.combo.boostEats,
+  );
+  state.comboEatTimes = [];
+}
+
+function consumeGrowthMultiplier() {
+  if (!isGrowthBoostActive()) {
+    updatePlayerComboColor();
+    return 1;
+  }
+
+  state.growthBoostEatsRemaining -= 1;
+  updatePlayerComboColor();
+  return CONFIG.combo.growthMultiplier;
+}
+
+function isGrowthBoostActive() {
+  return state.growthBoostEatsRemaining > 0 && state.elapsed <= state.growthBoostUntil;
+}
+
+function updatePlayerComboColor() {
+  state.player.color = isGrowthBoostActive() ? CONFIG.combo.boostColor : COLORS.player;
 }
 
 function applyHungerDecay(dt) {
