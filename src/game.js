@@ -36,6 +36,7 @@ const state = {
   spawnTimer: 0,
   score: 0,
   eaten: 0,
+  dangerSpawned: 0,
   player: null,
   fishes: [],
   effects: [],
@@ -77,6 +78,7 @@ function resetGame() {
   state.spawnTimer = 0;
   state.score = 0;
   state.eaten = 0;
+  state.dangerSpawned = 0;
   state.fishes = [];
   state.effects = [];
   state.player = new Fish({
@@ -339,7 +341,15 @@ function createFish() {
   }
 
   const x = side === -1 ? -length : state.width + length;
-  const speed = random(76, 136) + Math.min(42, state.elapsed * 1.1) + (kind === "danger" ? 18 : 0);
+  const speed = randomFishSpeed(kind);
+  const verticalSpeed = randomFishVerticalSpeed(kind);
+  const fast = kind === "danger" && shouldSpawnFastDanger();
+  const finalSpeed = fast ? speed * CONFIG.fishSpeed.fastDangerMultiplier : speed;
+
+  if (kind === "danger") {
+    state.dangerSpawned += 1;
+  }
+
   const palette = kind === "danger" ? COLORS.danger : COLORS.small;
 
   return new Fish({
@@ -347,10 +357,37 @@ function createFish() {
     y,
     size,
     direction,
-    speed,
+    speed: finalSpeed,
+    verticalSpeed,
     kind,
+    fast,
     color: palette[Math.floor(Math.random() * palette.length)],
   });
+}
+
+function randomFishSpeed(kind) {
+  const elapsedBonus = Math.min(
+    CONFIG.fishSpeed.elapsedBonusMax,
+    state.elapsed * CONFIG.fishSpeed.elapsedBonusPerSecond,
+  );
+
+  if (kind === "danger") {
+    return random(CONFIG.fishSpeed.dangerMin, CONFIG.fishSpeed.dangerMax) + elapsedBonus;
+  }
+
+  return random(CONFIG.fishSpeed.smallMin, CONFIG.fishSpeed.smallMax) + elapsedBonus * 0.5;
+}
+
+function randomFishVerticalSpeed(kind) {
+  if (kind !== "small") {
+    return 0;
+  }
+
+  return random(-CONFIG.fishSpeed.smallVerticalDriftMax, CONFIG.fishSpeed.smallVerticalDriftMax);
+}
+
+function shouldSpawnFastDanger() {
+  return (state.dangerSpawned + 1) % CONFIG.fishSpeed.fastDangerEvery === 0;
 }
 
 function chooseFishKind() {

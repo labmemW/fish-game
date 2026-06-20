@@ -1,18 +1,29 @@
 import { CONFIG } from "./config.js";
 
 export class Fish {
-  constructor({ x, y, size, direction = 1, speed = 0, kind = "small", color = "#f6c85f" }) {
+  constructor({
+    x,
+    y,
+    size,
+    direction = 1,
+    speed = 0,
+    verticalSpeed = 0,
+    kind = "small",
+    color = "#f6c85f",
+    fast = false,
+  }) {
     this.x = x;
     this.y = y;
     this.size = size;
     this.direction = direction;
     this.speed = speed;
+    this.fast = fast;
     this.kind = kind;
     this.color = color;
     this.baseVelocityX = direction * speed;
-    this.baseVelocityY = 0;
+    this.baseVelocityY = verticalSpeed;
     this.velocityX = direction * speed;
-    this.velocityY = 0;
+    this.velocityY = verticalSpeed;
     this.flash = 0;
   }
 
@@ -97,6 +108,17 @@ export function drawFish(ctx, fish, options = {}) {
     ctx.beginPath();
     ctx.moveTo(length * 0.16, -height * 0.22);
     ctx.lineTo(length * 0.02, height * 0.22);
+    ctx.stroke();
+  }
+
+  if (fish.fast) {
+    ctx.strokeStyle = "#ffe66d";
+    ctx.lineWidth = Math.max(2, height * 0.08);
+    ctx.beginPath();
+    ctx.moveTo(-length * 0.12, -height * 0.32);
+    ctx.lineTo(length * 0.1, height * 0.32);
+    ctx.moveTo(length * 0.04, -height * 0.32);
+    ctx.lineTo(length * 0.26, height * 0.32);
     ctx.stroke();
   }
 

@@ -26,6 +26,17 @@ export const CONFIG = {
     dangerSpawnAttempts: 18,
     sidePadding: 90,
   },
+  fishSpeed: {
+    smallMin: 68,
+    smallMax: 168,
+    smallVerticalDriftMax: 22,
+    dangerMin: 94,
+    dangerMax: 154,
+    elapsedBonusMax: 42,
+    elapsedBonusPerSecond: 1.1,
+    fastDangerEvery: 3,
+    fastDangerMultiplier: 2,
+  },
   fishSize: {
     smallMin: 0.45,
     smallMax: 0.8,
