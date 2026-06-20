@@ -52,6 +52,10 @@ export const CONFIG = {
     lateMaxPerFish: 0.62,
     postDangerMaxBoost: 1.8,
   },
+  hunger: {
+    idleDelay: 3,
+    decayPerSecond: 0.018,
+  },
   collision: {
     radiusXByLength: 0.3,
     radiusYByHeight: 0.36,

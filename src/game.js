@@ -34,6 +34,7 @@ const state = {
   lastTime: 0,
   elapsed: 0,
   spawnTimer: 0,
+  timeSinceEat: 0,
   score: 0,
   eaten: 0,
   dangerSpawned: 0,
@@ -76,6 +77,7 @@ function resizeCanvas() {
 function resetGame() {
   state.elapsed = 0;
   state.spawnTimer = 0;
+  state.timeSinceEat = 0;
   state.score = 0;
   state.eaten = 0;
   state.dangerSpawned = 0;
@@ -167,12 +169,14 @@ function loop(time) {
 function update(dt) {
   state.elapsed += dt;
   state.spawnTimer += dt;
+  state.timeSinceEat += dt;
 
   updatePlayer(dt);
   updateFishes(dt);
   updateEffects(dt);
   spawnFishIfNeeded();
   handleCollisions();
+  applyHungerDecay(dt);
 
   if (state.player.size >= currentTargetSize()) {
     endGame("won");
@@ -462,6 +466,7 @@ function ellipseCollision(a, b) {
 
 function eatFish(index, fish) {
   state.fishes.splice(index, 1);
+  state.timeSinceEat = 0;
   state.eaten += 1;
   state.score += Math.round(fish.size * 100);
   state.player.size += growthForFish(fish);
@@ -478,6 +483,21 @@ function eatFish(index, fish) {
       speed: random(18, 48),
     });
   }
+}
+
+function applyHungerDecay(dt) {
+  if (
+    state.timeSinceEat <= CONFIG.hunger.idleDelay ||
+    currentGrowthProgress() >= CONFIG.spawning.dangerStopProgress ||
+    state.player.size <= CONFIG.player.initialSize
+  ) {
+    return;
+  }
+
+  state.player.size = Math.max(
+    CONFIG.player.initialSize,
+    state.player.size - CONFIG.hunger.decayPerSecond * dt,
+  );
 }
 
 function growthForFish(fish) {
