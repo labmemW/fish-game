@@ -54,6 +54,17 @@ export const CONFIG = {
     fleeSteering: 0.12,
     returnSteering: 0.05,
   },
+  audio: {
+    music: {
+      volume: 0.035,
+      stepMs: 420,
+      noteDuration: 0.22,
+      notes: [261.63, 329.63, 392, 329.63, 293.66, 349.23, 440, 349.23],
+    },
+    effects: {
+      volume: 0.45,
+    },
+  },
   timing: {
     victoryMinSeconds: 60,
     victoryMaxSeconds: 120,

@@ -161,6 +161,10 @@ button {
   transform: translateY(1px);
 }
 
+.sound-button {
+  right: max(68px, calc(env(safe-area-inset-right) + 68px));
+}
+
 .hidden {
   display: none;
 }

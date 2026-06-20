@@ -1,16 +1,19 @@
 import { CONFIG } from "./config.js";
+import { AudioSystem } from "./audio.js";
 import { Fish, drawFish } from "./fish.js";
 import { InputController } from "./input.js";
 
 const canvas = document.querySelector("#gameCanvas");
 const ctx = canvas.getContext("2d");
 const input = new InputController(canvas);
+const audio = new AudioSystem(CONFIG.audio);
 
 const ui = {
   overlay: document.querySelector("#overlay"),
   statusText: document.querySelector("#statusText"),
   startButton: document.querySelector("#startButton"),
   pauseButton: document.querySelector("#pauseButton"),
+  soundButton: document.querySelector("#soundButton"),
   resumeButton: document.querySelector("#resumeButton"),
   restartButton: document.querySelector("#restartButton"),
   fishCount: document.querySelector("#fishCount"),
@@ -48,6 +51,7 @@ ui.startButton.addEventListener("click", startGame);
 ui.restartButton.addEventListener("click", startGame);
 ui.pauseButton.addEventListener("click", pauseGame);
 ui.resumeButton.addEventListener("click", resumeGame);
+ui.soundButton.addEventListener("click", toggleSound);
 
 function resizeCanvas() {
   const width = Math.max(CONFIG.world.minWidth, canvas.clientWidth || window.innerWidth);
@@ -86,7 +90,10 @@ function resetGame() {
   });
 }
 
-function startGame() {
+async function startGame() {
+  await audio.resume().catch(() => {});
+  audio.playStart();
+  audio.startMusic();
   requestGameFullscreen();
   resetGame();
   state.mode = "playing";
@@ -102,6 +109,8 @@ function pauseGame() {
   }
 
   state.mode = "paused";
+  audio.playPause();
+  audio.stopMusic();
   ui.overlay.classList.remove("hidden");
   updateUi();
 }
@@ -112,6 +121,8 @@ function resumeGame() {
   }
 
   state.mode = "playing";
+  audio.playResume();
+  audio.startMusic();
   ui.overlay.classList.add("hidden");
   ui.pauseButton.classList.remove("hidden");
   updateUi();
@@ -119,8 +130,24 @@ function resumeGame() {
 
 function endGame(mode) {
   state.mode = mode;
+  audio.stopMusic();
+  if (mode === "won") {
+    audio.playWin();
+  } else {
+    audio.playLose();
+  }
   ui.overlay.classList.remove("hidden");
   updateUi();
+}
+
+function toggleSound() {
+  const muted = audio.toggleMuted();
+  ui.soundButton.textContent = muted ? "×" : "♪";
+  ui.soundButton.setAttribute("aria-label", muted ? "打开声音" : "关闭声音");
+
+  if (!muted && state.mode === "playing") {
+    audio.startMusic();
+  }
 }
 
 function loop(time) {
@@ -402,6 +429,7 @@ function eatFish(index, fish) {
   state.score += Math.round(fish.size * 100);
   state.player.size += growthForFish(fish);
   state.player.flash = 1;
+  audio.playEat(fish.size);
 
   for (let i = 0; i < 7; i += 1) {
     state.effects.push({
