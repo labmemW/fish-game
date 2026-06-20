@@ -4,6 +4,8 @@ export const CONFIG = {
     initialSpeed: 780,
     minSpeed: 630,
     speedLossPerSize: 25,
+    stopRadius: 24,
+    slowRadius: 120,
     startXRatio: 0.28,
     startYRatio: 0.5,
     targetLengthRatio: 1.05,

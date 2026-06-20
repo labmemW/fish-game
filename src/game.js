@@ -161,12 +161,19 @@ function updatePlayer(dt) {
     const dy = input.position.y - player.y;
     const len = Math.hypot(dx, dy);
 
-    if (len > 5) {
-      player.velocityX = (dx / len) * maxSpeed;
-      player.velocityY = (dy / len) * maxSpeed;
+    if (len > CONFIG.player.stopRadius) {
+      const speedScale = Math.min(
+        1,
+        (len - CONFIG.player.stopRadius) /
+          (CONFIG.player.slowRadius - CONFIG.player.stopRadius),
+      );
+      const targetSpeed = maxSpeed * speedScale;
+
+      player.velocityX = (dx / len) * targetSpeed;
+      player.velocityY = (dy / len) * targetSpeed;
     } else {
-      player.velocityX *= 0.78;
-      player.velocityY *= 0.78;
+      player.velocityX *= 0.62;
+      player.velocityY *= 0.62;
     }
   } else {
     const slow = Math.pow(0.08, dt);
